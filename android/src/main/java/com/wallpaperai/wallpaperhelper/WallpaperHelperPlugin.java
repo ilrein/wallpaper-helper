@@ -5,7 +5,6 @@ import com.getcapacitor.Plugin;
 import com.getcapacitor.PluginCall;
 import com.getcapacitor.PluginMethod;
 import com.getcapacitor.annotation.CapacitorPlugin;
-import android.app.WallpaperManager;
 
 @CapacitorPlugin(name = "WallpaperHelper")
 public class WallpaperHelperPlugin extends Plugin {
@@ -20,7 +19,7 @@ public class WallpaperHelperPlugin extends Plugin {
         JSObject ret = new JSObject();
 
         try {
-            String result = implementation.setWallpaper(base64Image, isLockScreen);
+            String result = implementation.setWallpaper(getContext(), base64Image, isLockScreen);
             ret.put("value", result);
             call.resolve(ret);
         } catch (Exception e) {
