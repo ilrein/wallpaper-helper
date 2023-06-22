@@ -19,4 +19,16 @@ public class WallpaperHelperPlugin extends Plugin {
         ret.put("value", implementation.echo(value));
         call.resolve(ret);
     }
+
+    @PluginMethod
+    public void setWallpaper(PluginCall call) {
+        String base64Image = call.getString("base64");
+        boolean setBoth = call.getBoolean("setBoth", false);
+
+        String result = implementation.setWallpaper(base64Image, setBoth);
+
+        JSObject ret = new JSObject();
+        ret.put("result", result);
+        call.resolve(ret);
+    }
 }
