@@ -10,6 +10,8 @@ import android.net.Uri;
 import android.util.Base64;
 import android.util.Log;
 
+import androidx.core.content.FileProvider;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -21,14 +23,17 @@ public class WallpaperHelper {
         Bitmap bitmap = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
 
         // Convert bitmap to file and get Uri
-        File file = new File(activity.getCacheDir(), "temp.jpg");
-        try (FileOutputStream out = new FileOutputStream(file)) {
+        File cachePath = new File(activity.getCacheDir(), "images");
+        cachePath.mkdirs();
+        File filePath = new File(cachePath, "image.jpg");
+        try (FileOutputStream out = new FileOutputStream(filePath)) {
             bitmap.compress(Bitmap.CompressFormat.JPEG, 100, out);
         } catch (IOException e) {
             Log.e("WallpaperHelper", "Error writing file: " + e.getMessage());
             return;
         }
-        Uri uri = Uri.fromFile(file);
+        String authority = activity.getApplicationContext().getPackageName() + ".fileprovider";
+        Uri uri = FileProvider.getUriForFile(activity, authority, filePath);
 
         // Start the wallpaper setting activity
         WallpaperManager wallpaperManager = WallpaperManager.getInstance(activity);
