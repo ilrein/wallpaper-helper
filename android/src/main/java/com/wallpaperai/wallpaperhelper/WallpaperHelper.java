@@ -12,9 +12,12 @@ import android.util.Log;
 
 import androidx.core.content.FileProvider;
 
+import com.yalantis.ucrop.UCrop;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 
 public class WallpaperHelper {
 
@@ -33,27 +36,29 @@ public class WallpaperHelper {
             return;
         }
         String authority = activity.getApplicationContext().getPackageName() + ".fileprovider";
-        Uri uri = FileProvider.getUriForFile(activity, authority, filePath);
+        Uri sourceUri = FileProvider.getUriForFile(activity, authority, filePath);
 
-        // Start the wallpaper setting activity
-        WallpaperManager wallpaperManager = WallpaperManager.getInstance(activity);
-        Intent intent;
-        intent = wallpaperManager.getCropAndSetWallpaperIntent(uri);
-        activity.startActivityForResult(intent, REQUEST_SET_WALLPAPER);
+        // Start the cropping activity with uCrop
+        UCrop.of(sourceUri, sourceUri)
+                .withAspectRatio(5f, 5f) // Customize as needed
+                .start(activity);
     }
 
-
     // Call this method in your activity's onActivityResult method
-    public void handleActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == REQUEST_SET_WALLPAPER) {
-            if (resultCode == Activity.RESULT_OK) {
-                Log.i("WallpaperHelper", "Wallpaper set successfully");
-            } else {
-                Log.i("WallpaperHelper", "Wallpaper setting cancelled");
+    public void handleActivityResult(Activity activity, int requestCode, int resultCode, Intent data) {
+        if (requestCode == UCrop.REQUEST_CROP && resultCode == Activity.RESULT_OK) {
+            Uri resultUri = UCrop.getOutput(data);
+
+            // Set the cropped image as wallpaper
+            WallpaperManager wallpaperManager = WallpaperManager.getInstance(activity);
+            try (InputStream in = activity.getContentResolver().openInputStream(resultUri)) {
+                if (in != null) {
+                    wallpaperManager.setStream(in);
+                    Log.i("WallpaperHelper", "Wallpaper set successfully");
+                }
+            } catch (IOException e) {
+                Log.e("WallpaperHelper", "Error setting wallpaper: " + e.getMessage());
             }
         }
     }
-
-    public static final int REQUEST_SET_WALLPAPER = 1;
-
 }

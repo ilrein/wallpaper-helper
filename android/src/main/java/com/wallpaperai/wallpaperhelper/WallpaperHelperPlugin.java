@@ -7,6 +7,7 @@ import com.getcapacitor.PluginMethod;
 import com.getcapacitor.annotation.CapacitorPlugin;
 import android.content.Intent;
 import android.app.Activity;
+import com.yalantis.ucrop.UCrop;
 
 @CapacitorPlugin(name = "WallpaperHelper")
 public class WallpaperHelperPlugin extends Plugin {
@@ -39,7 +40,7 @@ public class WallpaperHelperPlugin extends Plugin {
         
         JSObject ret = new JSObject();
 
-        if (requestCode == WallpaperHelper.REQUEST_SET_WALLPAPER) {
+        if (requestCode == UCrop.REQUEST_CROP) {
             if (resultCode == Activity.RESULT_OK) {
                 ret.put("value", "Success");
                 savedCall.resolve(ret);
