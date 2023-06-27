@@ -40,8 +40,7 @@ public class WallpaperHelper {
 
         // Start the cropping activity with uCrop
         UCrop.of(sourceUri, sourceUri)
-                .withAspectRatio(5f, 5f) // Customize as needed
-                .start(activity);
+            .start(activity);
     }
 
     // Call this method in your activity's onActivityResult method
