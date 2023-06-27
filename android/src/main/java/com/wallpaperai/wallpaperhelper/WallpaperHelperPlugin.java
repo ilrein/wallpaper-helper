@@ -10,20 +10,41 @@ import com.getcapacitor.annotation.CapacitorPlugin;
 public class WallpaperHelperPlugin extends Plugin {
 
     private WallpaperHelper implementation = new WallpaperHelper();
+    private PluginCall savedCall;
 
     @PluginMethod
     public void setWallpaper(PluginCall call) {
         String base64Image = call.getString("base64");
         boolean isLockScreen = call.getBoolean("isLockScreen", false); // default to false if not provided
 
-        JSObject ret = new JSObject();
-
+        // Save the call so we can resolve it in handleOnActivityResult
+        savedCall = call;
+        
         try {
-            String result = implementation.setWallpaper(getContext(), base64Image, isLockScreen);
-            ret.put("value", result);
-            call.resolve(ret);
+            implementation.setWallpaper(getActivity(), base64Image, isLockScreen);
         } catch (Exception e) {
             call.reject(e.getMessage(), e);
+        }
+    }
+
+    @Override
+    protected void handleOnActivityResult(int requestCode, int resultCode, Intent data) {
+        super.handleOnActivityResult(requestCode, resultCode, data);
+        
+        if (savedCall == null) {
+            return;
+        }
+        
+        JSObject ret = new JSObject();
+
+        if (requestCode == WallpaperHelper.REQUEST_SET_WALLPAPER) {
+            if (resultCode == Activity.RESULT_OK) {
+                ret.put("value", "Success");
+                savedCall.resolve(ret);
+            } else {
+                savedCall.reject("Cancelled");
+            }
+            savedCall = null;
         }
     }
 }
