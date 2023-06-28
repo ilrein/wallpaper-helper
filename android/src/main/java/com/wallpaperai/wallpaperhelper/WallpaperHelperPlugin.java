@@ -8,6 +8,7 @@ import com.getcapacitor.annotation.CapacitorPlugin;
 import android.content.Intent;
 import android.app.Activity;
 import com.yalantis.ucrop.UCrop;
+import android.util.Log;
 
 @CapacitorPlugin(name = "WallpaperHelper")
 public class WallpaperHelperPlugin extends Plugin {
@@ -18,7 +19,6 @@ public class WallpaperHelperPlugin extends Plugin {
     @PluginMethod
     public void setWallpaper(PluginCall call) {
         String base64Image = call.getString("base64");
-        // boolean isLockScreen = call.getBoolean("isLockScreen", false); // default to false if not provided
 
         // Save the call so we can resolve it in handleOnActivityResult
         savedCall = call;
@@ -33,6 +33,8 @@ public class WallpaperHelperPlugin extends Plugin {
     @Override
     protected void handleOnActivityResult(int requestCode, int resultCode, Intent data) {
         super.handleOnActivityResult(requestCode, resultCode, data);
+
+        Log.i("handleOnActivityResult Plugin", "requestCode: " + requestCode + ", resultCode: " + resultCode);
         
         if (savedCall == null) {
             return;

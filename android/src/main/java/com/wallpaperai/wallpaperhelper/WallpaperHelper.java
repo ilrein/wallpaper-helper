@@ -40,11 +40,12 @@ public class WallpaperHelper {
 
         // Start the cropping activity with uCrop
         UCrop.of(sourceUri, sourceUri)
-            .start(activity);
+                .start(activity);
     }
 
     // Call this method in your activity's onActivityResult method
     public void handleActivityResult(Activity activity, int requestCode, int resultCode, Intent data) {
+        Log.i("handleOnActivityResult WallpaperHelper", "requestCode: " + requestCode + ", resultCode: " + resultCode);
         if (requestCode == UCrop.REQUEST_CROP && resultCode == Activity.RESULT_OK) {
             Uri resultUri = UCrop.getOutput(data);
 
