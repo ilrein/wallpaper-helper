@@ -28,7 +28,7 @@ public class WallpaperHelper {
         // Convert bitmap to file and get Uri
         File cachePath = new File(activity.getCacheDir(), "images");
         cachePath.mkdirs();
-        File filePath = new File(cachePath, "image.jpg");
+        File filePath = new File(cachePath, "image.png");
         try (FileOutputStream out = new FileOutputStream(filePath)) {
             bitmap.compress(Bitmap.CompressFormat.JPEG, 100, out);
         } catch (IOException e) {
