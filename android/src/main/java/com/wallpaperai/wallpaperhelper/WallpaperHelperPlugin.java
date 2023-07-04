@@ -16,6 +16,11 @@ public class WallpaperHelperPlugin extends Plugin {
     private WallpaperHelper implementation = new WallpaperHelper();
     private PluginCall savedCall;
 
+    public WallpaperHelperPlugin() {
+        super();
+        Log.v("WallpaperHelperPlugin", "Plugin loaded");
+    }
+
     @PluginMethod
     public void setWallpaper(PluginCall call) {
         String base64Image = call.getString("base64");
@@ -34,7 +39,13 @@ public class WallpaperHelperPlugin extends Plugin {
     protected void handleOnActivityResult(int requestCode, int resultCode, Intent data) {
         super.handleOnActivityResult(requestCode, resultCode, data);
 
-        Log.i("handleOnActivityResult Plugin", "requestCode: " + requestCode + ", resultCode: " + resultCode);
+        Log.v("handleOnActivityResult Plugin", "requestCode: " + requestCode + ", resultCode: " + resultCode);
+
+        if (requestCode == UCrop.REQUEST_CROP) {
+            Log.v("handleOnActivityResult Plugin", "Request code matches UCrop.REQUEST_CROP");
+        } else {
+            Log.v("handleOnActivityResult Plugin", "Request code does not match UCrop.REQUEST_CROP");
+        }
         
         if (savedCall == null) {
             return;
