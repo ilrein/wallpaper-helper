@@ -1,6 +1,6 @@
 {
   "name": "wallpaper-helper",
-  "version": "0.0.5i",
+  "version": "0.0.6i",
   "description": "set wallpapers on android with ionic",
   "main": "dist/plugin.cjs.js",
   "module": "dist/esm/index.js",
