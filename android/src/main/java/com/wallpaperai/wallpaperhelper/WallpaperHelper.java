@@ -16,7 +16,7 @@ import java.io.IOException;
 
 public class WallpaperHelper {
 
-    public void setWallpaper(Activity activity, String base64Image, boolean setBoth) {
+    public void setWallpaper(Activity activity, String base64Image) {
         byte[] decodedString = Base64.decode(base64Image, Base64.DEFAULT);
         Bitmap bitmap = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
 
@@ -33,11 +33,7 @@ public class WallpaperHelper {
         // Start the wallpaper setting activity
         WallpaperManager wallpaperManager = WallpaperManager.getInstance(activity);
         Intent intent;
-        if (setBoth) {
-            intent = wallpaperManager.getCropAndSetWallpaperIntent(uri);
-        } else {
-            intent = wallpaperManager.getCropAndSetWallpaperIntent(uri, WallpaperManager.FLAG_SYSTEM);
-        }
+        intent = wallpaperManager.getCropAndSetWallpaperIntent(uri);
         activity.startActivityForResult(intent, REQUEST_SET_WALLPAPER);
     }
 
@@ -52,5 +48,5 @@ public class WallpaperHelper {
         }
     }
 
-    private static final int REQUEST_SET_WALLPAPER = 1;
+    public static final int REQUEST_SET_WALLPAPER = 1;
 }
