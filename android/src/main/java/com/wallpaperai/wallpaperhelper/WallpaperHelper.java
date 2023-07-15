@@ -10,7 +10,8 @@ import android.net.Uri;
 import android.util.Base64;
 import android.util.Log;
 import androidx.core.content.FileProvider;
-import com.yalantis.ucrop.UCrop;
+import com.theartofdev.edmodo.cropper.CropImage;
+import com.theartofdev.edmodo.cropper.CropImageView;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -32,23 +33,33 @@ public class WallpaperHelper {
         String authority = context.getApplicationContext().getPackageName() + ".fileprovider";
         Uri sourceUri = FileProvider.getUriForFile(context, authority, filePath);
 
-        // Start the cropping activity with uCrop
-        UCrop.of(sourceUri, sourceUri).start((Activity) context);
+        // Start the cropping activity with Android-Image-Cropper
+        CropImage.activity(sourceUri).setGuidelines(CropImageView.Guidelines.ON).start((Activity) context);
     }
 
-    public void handleActivityResult(Activity activity, int requestCode, int resultCode, Intent data) {
-        if (requestCode == UCrop.REQUEST_CROP && resultCode == Activity.RESULT_OK) {
-            Uri resultUri = UCrop.getOutput(data);
+    public void handleActivityResult(Activity activity, int requestCode, int resultCode, Intent data, boolean setBoth) {
+        if (requestCode == CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE) {
+            CropImage.ActivityResult result = CropImage.getActivityResult(data);
+            if (resultCode == Activity.RESULT_OK) {
+                Uri resultUri = result.getUri();
 
-            // Set the cropped image as wallpaper
-            WallpaperManager wallpaperManager = WallpaperManager.getInstance(activity);
-            try (InputStream in = activity.getContentResolver().openInputStream(resultUri)) {
-                if (in != null) {
-                    wallpaperManager.setStream(in);
-                    Log.v("WallpaperHelper", "Wallpaper set successfully");
+                // Set the cropped image as wallpaper
+                WallpaperManager wallpaperManager = WallpaperManager.getInstance(activity);
+                try (InputStream in = activity.getContentResolver().openInputStream(resultUri)) {
+                    if (in != null) {
+                        if (setBoth && android.os.Build.VERSION.SDK_INT >= 24) {
+                            wallpaperManager.setStream(in, null, true, WallpaperManager.FLAG_SYSTEM | WallpaperManager.FLAG_LOCK);
+                        } else {
+                            wallpaperManager.setStream(in);
+                        }
+                        Log.v("WallpaperHelper", "Wallpaper set successfully");
+                    }
+                } catch (IOException e) {
+                    Log.e("WallpaperHelper", "Error setting wallpaper: " + e.getMessage());
                 }
-            } catch (IOException e) {
-                Log.e("WallpaperHelper", "Error setting wallpaper: " + e.getMessage());
+            } else if (resultCode == CropImage.CROP_IMAGE_ACTIVITY_RESULT_ERROR_CODE) {
+                Exception error = result.getError();
+                Log.e("WallpaperHelper", "Error during cropping: " + error.getMessage());
             }
         }
     }

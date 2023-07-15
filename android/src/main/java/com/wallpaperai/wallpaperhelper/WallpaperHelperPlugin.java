@@ -10,7 +10,7 @@ import com.getcapacitor.Plugin;
 import com.getcapacitor.PluginCall;
 import com.getcapacitor.PluginMethod;
 import com.getcapacitor.annotation.CapacitorPlugin;
-import com.yalantis.ucrop.UCrop;
+import com.theartofdev.edmodo.cropper.CropImage;
 
 @CapacitorPlugin(name = "WallpaperHelper")
 public class WallpaperHelperPlugin extends Plugin {
@@ -48,8 +48,9 @@ public class WallpaperHelperPlugin extends Plugin {
             return;
         }
 
-        if (requestCode == UCrop.REQUEST_CROP && resultCode == getActivity().RESULT_OK) {
-            implementation.handleActivityResult(getActivity(), requestCode, resultCode, data);
+        if (requestCode == CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE) {
+            boolean setBoth = savedCall.getBoolean("setBoth", false);
+            implementation.handleActivityResult(getActivity(), requestCode, resultCode, data, setBoth);
             JSObject ret = new JSObject();
             ret.put("value", "Success");
             savedCall.resolve(ret);
