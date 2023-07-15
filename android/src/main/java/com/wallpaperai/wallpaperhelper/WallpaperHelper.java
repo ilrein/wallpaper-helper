@@ -8,14 +8,10 @@ import android.graphics.BitmapFactory;
 import android.util.Base64;
 import android.util.DisplayMetrics;
 import android.util.Log;
-<<<<<<< Updated upstream
-import java.io.ByteArrayInputStream;
-=======
 import androidx.core.content.FileProvider;
 import com.yalantis.ucrop.UCrop;
 import java.io.File;
 import java.io.FileOutputStream;
->>>>>>> Stashed changes
 import java.io.IOException;
 import java.io.InputStream;
 
