@@ -26,14 +26,18 @@ public class WallpaperHelperPlugin extends Plugin {
     public void setWallpaper(PluginCall call) {
         String base64Image = call.getString("base64");
         boolean setBoth = call.getBoolean("setBoth", false);
+        Log.v("WallpaperHelperPlugin", "setWallpaper");
 
         try {
             byte[] decodedString = Base64.decode(base64Image, Base64.DEFAULT);
             Bitmap bitmap = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
             implementation.startCroppingActivity(getContext(), bitmap);
 
+            Log.v("WallpaperHelperPlugin", "saveCall");
+
             saveCall(call);
         } catch (Exception e) {
+            Log.e("WallpaperHelperPlugin", "Error setting wallpaper: " + e.getMessage());
             call.reject(e.getMessage(), e);
         }
     }
@@ -47,6 +51,11 @@ public class WallpaperHelperPlugin extends Plugin {
             Log.e("WallpaperHelperPlugin", "No stored plugin call for onActivityResult");
             return;
         }
+
+        Log.v("WallpaperHelperPlugin", "onActivityResult");
+        Log.v("WallpaperHelperPlugin", String.valueOf(requestCode));
+        Log.v("WallpaperHelperPlugin", String.valueOf(resultCode));
+        Log.v("WallpaperHelperPlugin", String.valueOf(CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE));
 
         if (requestCode == CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE) {
             boolean setBoth = savedCall.getBoolean("setBoth", false);

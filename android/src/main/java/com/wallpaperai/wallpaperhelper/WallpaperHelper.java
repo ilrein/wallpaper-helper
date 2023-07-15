@@ -34,10 +34,16 @@ public class WallpaperHelper {
         Uri sourceUri = FileProvider.getUriForFile(context, authority, filePath);
 
         // Start the cropping activity with Android-Image-Cropper
+        Log.v("WallpaperHelper", "startCroppingActivity");
         CropImage.activity(sourceUri).setGuidelines(CropImageView.Guidelines.ON).start((Activity) context);
     }
 
     public void handleActivityResult(Activity activity, int requestCode, int resultCode, Intent data, boolean setBoth) {
+        Log.v("WallpaperHelper", "handleActivityResult");
+        Log.v("WallpaperHelper", String.valueOf(requestCode));
+        Log.v("WallpaperHelper", String.valueOf(resultCode));
+        Log.v("WallpaperHelper", String.valueOf(CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE));
+
         if (requestCode == CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE) {
             CropImage.ActivityResult result = CropImage.getActivityResult(data);
             if (resultCode == Activity.RESULT_OK) {
@@ -61,6 +67,8 @@ public class WallpaperHelper {
                 Exception error = result.getError();
                 Log.e("WallpaperHelper", "Error during cropping: " + error.getMessage());
             }
+        } else {
+            Log.e("WallpaperHelper", "Unexpected requestCode: " + requestCode);
         }
     }
 }
