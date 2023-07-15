@@ -1,8 +1,10 @@
 package com.wallpaperai.wallpaperhelper;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.util.Base64;
 import android.util.Log;
 import com.getcapacitor.JSObject;
@@ -11,6 +13,7 @@ import com.getcapacitor.PluginCall;
 import com.getcapacitor.PluginMethod;
 import com.getcapacitor.annotation.CapacitorPlugin;
 import com.theartofdev.edmodo.cropper.CropImage;
+import com.theartofdev.edmodo.cropper.CropImageView;
 
 @CapacitorPlugin(name = "WallpaperHelper")
 public class WallpaperHelperPlugin extends Plugin {
@@ -49,13 +52,20 @@ public class WallpaperHelperPlugin extends Plugin {
         }
 
         if (requestCode == CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE) {
-            boolean setBoth = savedCall.getBoolean("setBoth", false);
-            implementation.handleActivityResult(getActivity(), requestCode, resultCode, data, setBoth);
-            JSObject ret = new JSObject();
-            ret.put("value", "Success");
-            savedCall.resolve(ret);
+            CropImage.ActivityResult result = CropImage.getActivityResult(data);
+            if (resultCode == Activity.RESULT_OK) {
+                Uri resultUri = result.getUri();
+                boolean setBoth = savedCall.getBoolean("setBoth", false);
+                implementation.handleActivityResult(getActivity(), requestCode, resultCode, data, setBoth);
+                JSObject ret = new JSObject();
+                ret.put("value", "Success");
+                savedCall.resolve(ret);
+            } else if (resultCode == CropImage.CROP_IMAGE_ACTIVITY_RESULT_ERROR_CODE) {
+                Exception error = result.getError();
+                savedCall.reject("Failed to set wallpaper: " + error.getMessage());
+            }
         } else {
-            savedCall.reject("Failed to set wallpaper");
+            savedCall.reject("Unexpected requestCode: " + requestCode);
         }
     }
 }
