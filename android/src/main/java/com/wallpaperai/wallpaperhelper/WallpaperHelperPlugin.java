@@ -32,23 +32,30 @@ public class WallpaperHelperPlugin extends Plugin {
             Bitmap bitmap = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
             implementation.startCroppingActivity(getContext(), bitmap);
 
-            // Save the call for later
             saveCall(call);
         } catch (Exception e) {
             call.reject(e.getMessage(), e);
         }
     }
 
-    @ActivityCallback
-    private void handleActivityResult(PluginCall call, ActivityResult result) {
-        if (call == null) {
+    @Override
+    protected void handleOnActivityResult(int requestCode, int resultCode, Intent data) {
+        super.handleOnActivityResult(requestCode, resultCode, data);
+
+        PluginCall savedCall = getSavedCall();
+        if (savedCall == null) {
+            Log.e("WallpaperHelperPlugin", "No stored plugin call for onActivityResult");
             return;
         }
 
-        boolean setBoth = call.getBoolean("setBoth", false);
-        implementation.handleActivityResult(getActivity(), result.getResultCode(), result.getData(), setBoth);
-        JSObject ret = new JSObject();
-        ret.put("value", "Success");
-        call.resolve(ret);
+        if (requestCode == CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE) {
+            boolean setBoth = savedCall.getBoolean("setBoth", false);
+            implementation.handleActivityResult(getActivity(), requestCode, resultCode, data, setBoth);
+            JSObject ret = new JSObject();
+            ret.put("value", "Success");
+            savedCall.resolve(ret);
+        } else {
+            savedCall.reject("Failed to set wallpaper");
+        }
     }
 }
