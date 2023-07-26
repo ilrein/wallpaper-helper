@@ -1,6 +1,6 @@
 {
   "name": "wallpaper-helper",
-  "version": "0.0.16a",
+  "version": "0.0.16b",
   "description": "set wallpapers on android with ionic",
   "main": "dist/plugin.cjs.js",
   "module": "dist/esm/index.js",
@@ -44,7 +44,8 @@
     "prepublishOnly": "npm run build"
   },
   "devDependencies": {
-    "@capacitor/android": "^5.0.0",
+    "@capacitor/android": "^5.2.2",
+    "@capacitor/cli": "^5.2.2",
     "@capacitor/core": "^5.0.0",
     "@capacitor/docgen": "^0.0.18",
     "@capacitor/ios": "^5.0.0",
