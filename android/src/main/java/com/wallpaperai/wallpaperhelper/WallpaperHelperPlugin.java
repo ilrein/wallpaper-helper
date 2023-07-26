@@ -1,14 +1,17 @@
 package com.wallpaperai.wallpaperhelper;
 
+import android.app.Activity;
+import android.content.Intent;
 import com.getcapacitor.JSObject;
 import com.getcapacitor.Plugin;
 import com.getcapacitor.PluginCall;
 import com.getcapacitor.PluginMethod;
 import com.getcapacitor.annotation.CapacitorPlugin;
-import android.content.Intent;
-import android.app.Activity;
 
-@CapacitorPlugin(name = "WallpaperHelper")
+@CapacitorPlugin(
+    name = "WallpaperHelper",
+    permissions = { @Permission(alias = "setWallpaper", strings = { "android.permission.SET_WALLPAPER" }) }
+)
 public class WallpaperHelperPlugin extends Plugin {
 
     private WallpaperHelper implementation = new WallpaperHelper();
@@ -16,12 +19,17 @@ public class WallpaperHelperPlugin extends Plugin {
 
     @PluginMethod
     public void setWallpaper(PluginCall call) {
+        if (getPermissionState("setWallpaper") != PermissionState.GRANTED) {
+            requestPermissionForAlias("setWallpaper", call, "permissionCallback");
+            return;
+        }
+
         String base64Image = call.getString("base64");
         // boolean isLockScreen = call.getBoolean("isLockScreen", false); // default to false if not provided
 
         // Save the call so we can resolve it in handleOnActivityResult
         savedCall = call;
-        
+
         try {
             implementation.setWallpaper(getActivity(), base64Image);
         } catch (Exception e) {
@@ -32,11 +40,11 @@ public class WallpaperHelperPlugin extends Plugin {
     @Override
     protected void handleOnActivityResult(int requestCode, int resultCode, Intent data) {
         super.handleOnActivityResult(requestCode, resultCode, data);
-        
+
         if (savedCall == null) {
             return;
         }
-        
+
         JSObject ret = new JSObject();
 
         if (requestCode == WallpaperHelper.REQUEST_SET_WALLPAPER) {
@@ -47,6 +55,15 @@ public class WallpaperHelperPlugin extends Plugin {
                 savedCall.reject("Cancelled");
             }
             savedCall = null;
+        }
+    }
+
+    @PermissionCallback
+    private void permissionCallback(PluginCall call) {
+        if (getPermissionState("setWallpaper") == PermissionState.GRANTED) {
+            setWallpaper(call);
+        } else {
+            call.reject("Permission denied");
         }
     }
 }
